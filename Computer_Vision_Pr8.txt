@@ -1,0 +1,22 @@
+!pip install ultralyticsopencv-python
+
+from ultralytics import YOLO
+import cv2
+from google.colab.patches import cv2_imshow
+
+# Load YOLO model
+model = YOLO("yolov8n.pt")
+
+# Read image
+image = cv2.imread("image.jpg")
+
+# Detect objects
+results = model(image)
+
+# Draw bounding boxes
+for r in results:
+    annotated_image = r.plot()
+
+# Show image (Colab compatible)
+cv2_imshow(annotated_image)
+
