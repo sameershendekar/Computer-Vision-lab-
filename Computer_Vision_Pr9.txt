@@ -1,0 +1,55 @@
+# Install DeepFace
+!pip install deepface --quiet
+
+# Import libraries
+from deepface import DeepFace
+import cv2
+import matplotlib.pyplot as plt
+
+# Path to your image
+image_path = 'emotions.jpg'
+
+# Load image using OpenCV
+image_bgr = cv2.imread(image_path)
+
+if image_bgr is None:
+    print(f"Error: The image at '{image_path}' could not be found.")
+else:
+    # Convert BGR to RGB
+    img_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
+    print(f"Successfully loaded '{image_path}' with dimensions {img_rgb.shape}.")
+
+    # Perform facial expression analysis
+    results = DeepFace.analyze(
+        img_path=img_rgb,
+        actions=['emotion'],
+        enforce_detection=False
+    )
+
+
+    # Ensure results is always a list for consistent iteration
+    if isinstance(results, dict):
+        results = [results]
+
+    print(f"Detected {len(results)} face(s).")
+    print(results)
+
+    # Annotate image
+    annotated_img = img_rgb.copy()
+    for face in results:
+        region = face['region']
+        x, y, w, h = region['x'], region['y'], region['w'], region['h']
+        emotion = face['dominant_emotion']
+
+        # Draw bounding box (Green in RGB)
+        cv2.rectangle(annotated_img, (x, y), (x + w, y + h), (0, 255, 0), 5)
+        cv2.putText(annotated_img, emotion, (x, y - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+    # Display annotated image
+    plt.figure(figsize=(10, 7))
+    plt.imshow(annotated_img)
+    plt.title("Facial Expression Detection Results")
+    plt.axis('off')
+    plt.show()
+
